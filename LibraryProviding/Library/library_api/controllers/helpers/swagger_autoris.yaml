@@ -1,0 +1,405 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a sample server Petstore server.  You can find out more about\
+    \     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,\
+    \ #swagger](http://swagger.io/irc/).      For this sample, you can use the api\
+    \ key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Swagger Library"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/v2"
+tags:
+- name: "Reader"
+  description: "Library reader"
+- name: "Ticket"
+  description: "Ticket of library reader"
+- name: "Tasks"
+  description: "List of tasks"
+- name: "OrderBook"
+  description: "Order data for one copy of the book"
+- name: "Literature"
+  description: "Metadata about book"
+schemes:
+- "https"
+- "http"
+paths:
+  /reader:
+    post:
+      tags:
+        - Reader
+      summary: BPMN 1
+      description: 'Registration reader with form data'
+      operationId: PostReader
+      consumes:
+         - multipart/form-data
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: firstName
+          in: formData
+          description: First name for add new or find exist user
+          required: true
+          type: string
+        - name: lastName
+          in: formData
+          description: Last name for add new or find exist user
+          required: true
+          type: string
+        - name: email
+          in: formData
+          required: true
+          type: string
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Ticket"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.reader_controller"
+      security:
+        - petstore_auth:
+            - 'receptionist'
+  /ticket/{ticket_id}: 
+    get:
+      tags:
+        - Ticket
+      summary: BPMN 4
+      description: 'Get reader ticket with message of debt for sending message'
+      operationId: GetTicket
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          description: Delete reader and his ticket
+          required: true
+          type: integer
+          format: int32  
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Ticket"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.ticket_controller"
+      security:
+        - petstore_auth:
+            - 'receptionist' 
+    put:
+      tags:
+        - Ticket
+      summary: User case "Редактирование анкеты"
+      description: 'Update reader ticket with form data'
+      operationId: PutTicket
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          description: Reader that need to be update
+          required: true
+          type: integer
+          format: int32
+        - name: firstName
+          in: formData
+          description: Update first name of Reader
+          type: string
+        - name: lastName
+          in: formData
+          description: Update last name of Reader
+          type: string
+        - name: email
+          in: formData
+          description: Update email of Reader
+          type: string
+      responses:
+        200:
+          description: "successful operation"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.ticket_controller"
+      security:
+        - petstore_auth:
+            - 'receptionist'
+    delete:
+      tags:
+        - Ticket
+      summary: User case "Удаление анкеты"
+      description: 'Delete reader ticket'
+      operationId: DeleterTicket
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          description: Delete reader and his ticket
+          required: true
+          type: integer
+          format: int32  
+      responses:
+        200:
+          description: "successful operation"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.ticket_controller"
+      security:
+        - petstore_auth:
+            - 'receptionist' 
+
+  /tasks/{ticket_id}:
+    get:
+      tags:
+        - Tasks
+      summary: BPMN 2 step 3
+      description: 'Get task for providing the reader with all the literature'
+      operationId: GetTasks
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          description: Number of ticket
+          required: true
+          type: integer
+          format: int32  
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Tasks"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.tasks_controller"
+      security:
+        - petstore_auth:
+            - 'receptionist' 
+    post:
+      tags:
+        - Tasks
+      summary: BPMN 2 step 1
+      description: 'Creating a new task for the issuance of literature'
+      operationId: AddTask
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          description: Reader that need book
+          required: true
+          type: integer
+          format: int32  
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Tasks"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.tasks_controller"
+      security:
+        - petstore_auth:
+            - 'librarian'
+            
+  /orderBook/{task_id}:
+    post:
+      tags:
+        - OrderBook
+      summary: BPMN 2 step 2
+      description: 'Add order book in task'
+      operationId: AddOrderBook
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: task_id
+          in: path
+          description: Reader that need book
+          required: true
+          type: integer
+          format: int32 
+        - name: firstName
+          in: formData
+          description: Update first name of Reader
+          type: string
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/OrderBook"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.order_book_controller"
+      security:
+        - petstore_auth:
+            - 'librarian'
+  /orderBook/delete/{id_literature}:  
+    delete:
+      tags:
+        - OrderBook
+      summary: BPMN 3
+      description: 'Delete order book from task'
+      operationId: DeleterOrderBook
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: id_literature
+          in: path
+          description: Delete order book
+          required: true
+          type: integer
+          format: int32  
+      responses:
+        200:
+          description: "successful operation"
+        405:
+          description: Invalid input
+        400:
+          description: Invalid data value
+      x-swagger-router-controller: "library_api.controllers.order_book_controller"
+      security:
+        - petstore_auth:
+            - 'receptionist' 
+            
+securityDefinitions:
+  petstore_auth:
+    type: oauth2
+    authorizationUrl: 'http://petstore.swagger.io/api/oauth/dialog'
+    flow: implicit
+    scopes:
+      'receptionist': work with data of reader
+      'librarian': work with tasks
+      
+definitions:
+  Reader:
+    type: object
+    required:
+    - id
+    properties:
+      id:
+        type: integer
+        format: int32
+      first_name:
+        type: string
+      last_name:
+        type: string
+      email:
+        type: string
+        pattern: '^.*@.*\..*$'
+    example:
+      last_name: last_name
+      id: 0
+      first_name: first_name
+  Ticket:
+    type: object
+    required:
+    - unique_key
+    properties:
+      unique_key:
+        type: integer
+        format: int32
+      date_of_registration:
+        type: string
+        format: date
+        pattern: '\d{1,2}.\d{1,2}.\d{4}'
+      tasks:
+        type: array
+        items:
+          $ref: '#/definitions/Tasks'
+      reader:
+        $ref: '#/definitions/Reader'
+  Tasks:
+    type: object
+    required:
+    - id
+    properties:
+      id:
+        type: integer
+        format: int32
+      order_book_list:
+        type: array
+        items:
+          $ref: '#/definitions/OrderBook'
+      registration_date:
+        type: string
+        format: date
+        pattern: '\d{1,2}.\d{1,2}.\d{4}'
+      expect_return_date:
+        type: string
+        format: date
+        pattern: '\d{1,2}.\d{1,2}.\d{4}'        
+  OrderBook:
+    type: object
+    required:
+    - id
+    properties:
+      status:
+        type: integer
+        pattern: '^[0-1]$'
+        description: Status 0 means 'book on hand' 1 - 'book returned'
+      fact_return_date:
+        type: string
+        format: date
+        pattern: '\d{1,2}.\d{1,2}.\d{4}'
+      id_literature:
+        $ref: '#/definitions/Literature'
+  Literature:
+    type: object
+    required:
+    - id
+    properties:
+      id:
+        type: integer
+      author:
+        type: string
+      title:
+        type: string
+    example:
+      author: author
+      id: 1
+      title: title
+  MaterialLiterature:
+    type: object
+    properties:
+      number_literature:
+        type: integer
+  ElectronicLiterature:
+    type: object
+    properties:
+      electronic_address:
+        type: string
+        pattern: '.*\..*'
